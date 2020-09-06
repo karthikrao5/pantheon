@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <glad/glad.h>
+#include <iostream>
 
 unsigned int Shader::loadShader(const char *vertex_file_path, const char *fragment_file_path) {
     // Read the Vertex Shader code from the file

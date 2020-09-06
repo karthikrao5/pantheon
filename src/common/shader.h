@@ -7,12 +7,14 @@
 
 #include <glad/glad.h>
 #include <string>
+#include <glm/glm.hpp>
 
 class Shader {
 public:
     unsigned int ProgramID{};
 
     unsigned int loadShader(const char *vertex_file_path, const char *fragment_file_path);
+//    void setUniformMat4f(std::string uniformName, glm::mat4 matrix);
 private:
     GLint result = GL_FALSE;
     int infoLogLength{};

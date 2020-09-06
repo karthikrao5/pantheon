@@ -1,12 +1,12 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
-//layout(location = 1) in vec3 vertexColor;
+layout(location = 1) in vec3 vertexColor;
 
 // Values that stay constant for the whole mesh.
 //uniform mat4 MVP;
 
 // Output data ; will be interpolated for each fragment.
-//out vec3 fragmentColor;
+out vec3 fragmentColor;
 
 void main()
 {
@@ -14,5 +14,5 @@ void main()
 //
 //    // The color of each vertex will be interpolated
 //    // to produce the color of each fragment
-//    fragmentColor = vertexColor;
+    fragmentColor = vertexColor;
 }

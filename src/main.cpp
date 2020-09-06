@@ -1,6 +1,8 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "common/shader.h"
 #include "Triangle.h"
 
@@ -47,13 +49,21 @@ int main() {
     Triangle triangle;
     triangle.init();
 
+    glm::mat4 proj = glm::ortho(-9.0f, 9.0f, -7.0f, 7.0f, 1.0f, -1.0f);
+
     Shader shader;
-    const std::string vertexFile = "/Users/karthik.rao/workspace/pantheon/src/common/vertex_shader.glsl";
-    const std::string fragFile = "/Users/karthik.rao/workspace/pantheon/src/common/frag.glsl";
+    const std::string vertexFile = "src/common/vertex_shader.glsl";
+    const std::string fragFile = "src/common/frag.glsl";
     programId = shader.loadShader(vertexFile.c_str(), fragFile.c_str());
 
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.1, 0.1, 0.1, 1.0); // set color to red
         glUseProgram(programId);
 

@@ -10,7 +10,9 @@
 
 class Triangle {
 private:
+    unsigned int vertexBufferId, indexBufferId, colorBufferId;
     std::vector<float> vertices;
+    std::vector<float> colors;
     std::vector<unsigned short> indices;
 
 public:
