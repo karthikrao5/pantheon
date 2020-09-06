@@ -1,0 +1,9 @@
+.DS_Store
+CMakeFiles/
+cmake-build-debug
+cmake_install.cmake
+install_manifest.txt
+libglad.dylib
+opengl_tutorial
+opengl_tutorial.cbp
+.idea/
