@@ -1,6 +1,8 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "common/shader.h"
+#include "Triangle.h"
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -8,11 +10,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
     const unsigned int WIDTH = 1280;
     const unsigned int HEIGHT = 720;
 
     GLFWwindow *window;
+    unsigned int programId;
 
     if (!glfwInit())
         exit(EXIT_FAILURE);
@@ -23,7 +25,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 //    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Simple example", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Game window", nullptr, nullptr);
     if (!window) {
         fprintf(stderr, "Unable to create GLFW window\n");
         glfwTerminate();
@@ -38,18 +40,29 @@ int main() {
         return -1;
     }
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
-    glViewport(0, 0, WIDTH, HEIGHT);
+//    glViewport(0, 0, WIDTH, HEIGHT);
 
     glfwSwapInterval(1);
 
-    while(!glfwWindowShouldClose(window)) {
+    Triangle triangle;
+    triangle.init();
+
+    Shader shader;
+    const std::string vertexFile = "/Users/karthik.rao/workspace/pantheon/src/common/vertex_shader.glsl";
+    const std::string fragFile = "/Users/karthik.rao/workspace/pantheon/src/common/frag.glsl";
+    programId = shader.loadShader(vertexFile.c_str(), fragFile.c_str());
+
+    while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
-        glClearColor(0.1, 0.5, 0.1, 1.0); // set color to red
+        glClearColor(0.1, 0.1, 0.1, 1.0); // set color to red
+        glUseProgram(programId);
+
+        triangle.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    glDeleteProgram(programId);
     glfwDestroyWindow(window);
 
     glfwTerminate();

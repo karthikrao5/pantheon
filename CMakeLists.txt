@@ -4,9 +4,9 @@ project(pantheon)
 set(CMAKE_CXX_STANDARD 14)
 set(GLAD_DIR ${CMAKE_SOURCE_DIR}/lib/glad)
 
-file(GLOB SOURCES src/*.cpp)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.h)
 
-add_executable(pantheon ${SOURCES})
+add_executable(pantheon ${SOURCES} src/Triangle.cpp src/Triangle.h)
 
 #glfw
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glfw)
