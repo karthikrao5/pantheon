@@ -5,16 +5,7 @@
 #include <glad/glad.h>
 #include <iostream>
 #include "Triangle.h"
-
-static void GLClearError() {
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static void GLCheckError() {
-    while (GLenum error = glGetError()) {
-        std::cout << "[OpenGL error] (" << error << ")" << std::endl;
-    }
-}
+#include "common/utils.h"
 
 void Triangle::init() {
     vertices = {
@@ -86,7 +77,6 @@ void Triangle::init() {
 }
 
 void Triangle::render() {
-    GLClearError();
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
@@ -98,9 +88,10 @@ void Triangle::render() {
     glBindBuffer(GL_ARRAY_BUFFER, colorBufferId);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
 
+    GLClearError();
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, nullptr);
+    GLCheckError();
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    GLCheckError();
 }
