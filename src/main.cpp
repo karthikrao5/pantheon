@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -32,17 +33,18 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-//    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-//        std::cout << "Failed to initialize GLAD" << std::endl;
-//        return -1;
-//    }
-//    fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
-//    glViewport(0, 0, WIDTH, HEIGHT);
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+    fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+    glViewport(0, 0, WIDTH, HEIGHT);
 
     glfwSwapInterval(1);
 
     while(!glfwWindowShouldClose(window)) {
-//        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.1, 0.5, 0.1, 1.0); // set color to red
 
         glfwSwapBuffers(window);
         glfwPollEvents();
