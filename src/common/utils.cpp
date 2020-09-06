@@ -9,8 +9,11 @@ void GLClearError() {
     while (glGetError() != GL_NO_ERROR);
 }
 
-void GLCheckError() {
+bool GLLogCall(const char *function, const char *file, int line) {
     while (GLenum error = glGetError()) {
-        std::cout << "[OpenGL error] (in hex: " << std::hex << error << ")" << std::endl;
+        std::cerr << "[OpenGL error] (in hex: " << std::hex << error << ") from " << function << " " << file << " "
+                  << line << std::endl;
+        return false;
     }
+    return true;
 }

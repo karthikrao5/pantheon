@@ -11,7 +11,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/lib/glm/cmake)
 
 file(GLOB_RECURSE SOURCES src/*.cpp src/*.h)
 
-add_executable(pantheon ${SOURCES})
+add_executable(pantheon ${SOURCES} src/common/debugBreak.h)
 
 #glfw
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glfw)
