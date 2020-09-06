@@ -2,6 +2,7 @@
 // Created by Karthik Rao on 8/29/20.
 //
 #include "shader.h"
+#include "utils.h"
 #include <fstream>
 #include <string>
 #include <vector>
@@ -20,19 +21,20 @@ unsigned int Shader::loadShader(const char *vertex_file_path, const char *fragme
     unsigned int fragmentShaderId = compileShader(GL_FRAGMENT_SHADER, fsCode);
 
     // Link the program
-    printf("Linking program\n");
+    std::cout << "Linking program\n" << std::endl;
     ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, vertexShaderId);
-    glAttachShader(ProgramID, fragmentShaderId);
-    glLinkProgram(ProgramID);
-    glValidateProgram(ProgramID);
+
+    GLCall(glAttachShader(ProgramID, vertexShaderId))
+    GLCall(glAttachShader(ProgramID, fragmentShaderId))
+    GLCall(glLinkProgram(ProgramID))
+    GLCall(glValidateProgram(ProgramID))
 
     // Check the program
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &result);
-    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogLength);
+    GLCall(glGetProgramiv(ProgramID, GL_LINK_STATUS, &result))
+    GLCall(glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogLength))
     if (infoLogLength > 0) {
         std::vector<char> ProgramErrorMessage(infoLogLength + 1);
-        glGetProgramInfoLog(ProgramID, infoLogLength, nullptr, &ProgramErrorMessage[0]);
+        GLCall(glGetProgramInfoLog(ProgramID, infoLogLength, nullptr, &ProgramErrorMessage[0]));
         printf("%s\n", &ProgramErrorMessage[0]);
     }
 
@@ -41,8 +43,8 @@ unsigned int Shader::loadShader(const char *vertex_file_path, const char *fragme
 //    glDetachShader(ProgramID, vertexShaderId);
 //    glDetachShader(ProgramID, fragmentShaderId);
 
-    glDeleteShader(vertexShaderId);
-    glDeleteShader(fragmentShaderId);
+    GLCall(glDeleteShader(vertexShaderId))
+    GLCall(glDeleteShader(fragmentShaderId))
 
     return ProgramID;
 }
@@ -50,18 +52,18 @@ unsigned int Shader::loadShader(const char *vertex_file_path, const char *fragme
 unsigned int Shader::compileShader(unsigned int type, const std::string &source) {
     const char *src = source.c_str();
     unsigned int id = glCreateShader(type);
-    glShaderSource(id, 1, &src, nullptr);
+    GLCall(glShaderSource(id, 1, &src, nullptr))
 
-    glCompileShader(id);
+    GLCall(glCompileShader(id))
 
     // Check Shader
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    GLCall(glGetShaderiv(id, GL_COMPILE_STATUS, &result))
     if (result == GL_FALSE) {
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
+        GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength))
         char *shaderErrorMessage = (char *) alloca(infoLogLength * sizeof(char));
-        glGetShaderInfoLog(id, infoLogLength, &infoLogLength, shaderErrorMessage);
+        GLCall(glGetShaderInfoLog(id, infoLogLength, &infoLogLength, shaderErrorMessage))
         printf("%s\n", &shaderErrorMessage[0]);
-        glDeleteShader(id);
+        GLCall(glDeleteShader(id))
         return 0;
     }
 
