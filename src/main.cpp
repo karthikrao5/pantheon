@@ -10,6 +10,9 @@
 #include "common/IndexBuffer.h"
 #include "common/VertexArray.h"
 #include "common/Renderer.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -49,8 +52,16 @@ int main() {
 //    glViewport(0, 0, WIDTH, HEIGHT);
 
     glfwSwapInterval(1);
-//    ================================================================
-    unsigned int programId;
+
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.Fonts->AddFontDefault();
+    io.Fonts->Build();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     std::vector<float> vertices = {
             // front
@@ -108,35 +119,60 @@ int main() {
 //    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
 //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f,0 ));
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-
     glm::mat4 view = glm::lookAt(
-            glm::vec3(4,3,3), // Camera is at (4,3,3), in World Space
+            glm::vec3(5,5,4), // Camera is at (4,3,3), in World Space
             glm::vec3(0,0,0), // and looks at the origin
             glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
 
     Renderer renderer;
-    float rotation = 0;
+    glm::vec3 model_position(0, 0, 0);
+    glm::vec3 rotation_vec(1.0f, 1.0f, 1.0f);
+
+    float rotationRadians = 0;
+    bool wireframeMode = false, xRot = true, yRot = false, zRot = false;
+
     while (!glfwWindowShouldClose(window)) {
+        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
         renderer.clear();
+
+        {
+            ImGui::Checkbox("xRot", &xRot); ImGui::SameLine();
+            ImGui::Checkbox("yRot", &yRot); ImGui::SameLine();
+            ImGui::Checkbox("zRot", &zRot); ImGui::SameLine();
+            ImGui::Checkbox("Wireframe", &wireframeMode);
+            ImGui::SliderFloat3("Translation", &model_position.x, 0.0f, 1.0f);
+            ImGui::SliderFloat("Rotation", &rotationRadians, 0.0f, 1000.0f);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
+
+        renderer.setWireframeMode(wireframeMode);
 
         shader.bind();
 
-        glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationRadians * 2.0f), glm::vec3(xRot ? 1.0f : 0, yRot ? 1.0f : 0, zRot ? 1.0f : 0));
+        glm::mat4 model = rotation * glm::translate(glm::mat4(1.0f), model_position);
 
         shader.setUniformMat4f("u_mvp", proj * view * model);
 
         renderer.draw(va, ib, shader);
 
-        if (rotation > 180.0f) {
-            rotation = 0;
-        } else {
-            rotation += 0.5f;
-        }
+        ImGui::Render();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     GLCall(glfwDestroyWindow(window))
 
     glfwTerminate();

@@ -17,6 +17,7 @@ void Renderer::clear() const {
 }
 
 Renderer::Renderer() {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     // Enable depth test
     GLCall(glEnable(GL_DEPTH_TEST))
     GLCall(glEnable(GL_CULL_FACE))
@@ -26,4 +27,8 @@ Renderer::Renderer() {
 
 Renderer::~Renderer() {
 
+}
+
+void Renderer::setWireframeMode(bool wireframeMode) const {
+    glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
 }

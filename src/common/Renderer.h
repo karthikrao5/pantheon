@@ -18,6 +18,8 @@ public:
     void clear() const;
 
     void draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const;
+
+    void setWireframeMode(bool wireframeMode) const;
 };
 
 #endif //PANTHEON_RENDERER_H

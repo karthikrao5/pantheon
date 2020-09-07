@@ -6,4 +6,5 @@ install_manifest.txt
 libglad.dylib
 opengl_tutorial
 opengl_tutorial.cbp
+imgui.ini
 .idea/
