@@ -49,7 +49,7 @@ int main() {
 
     glfwSwapInterval(1);
 //    ================================================================
-    unsigned int programId, indexBufferId;
+    unsigned int programId;
 
     std::vector<float> vertices = {
             // front
@@ -85,48 +85,23 @@ int main() {
             6, 7, 3
     };
 
-    Shader shader;
     const std::string vertexFile = "src/common/vertex_shader.glsl";
     const std::string fragFile = "src/common/frag.glsl";
-    programId = shader.loadShader(vertexFile.c_str(), fragFile.c_str());
+    Shader shader(vertexFile.c_str(), fragFile.c_str());
 
     VertexArray va;
-//    GLCall(glGenVertexArrays(1, &vaoId))
-//    GLCall(glBindVertexArray(vaoId))
-//    std::cout << "vao: " << vaoId << std::endl;
 
-//    GLCall(glGenBuffers(1, &vertexBufferId))
-//    GLCall(glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId))
-//    GLCall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * 3 * sizeof(float), &vertices[0], GL_STATIC_DRAW))
     VertexBuffer vb = VertexBuffer(&vertices[0], vertices.size() * 3 * sizeof(float));
     VertexBufferLayout layout;
-    layout.push<float>(3);
-    layout.push<float>(3);
+    layout.push<float>(3); // vec3 for x,y,z vertex positions
+    layout.push<float>(3); // vec3 for r,g,b color values per vertex
     va.addBuffer(vb, layout);
 
-//    GLCall(glEnableVertexAttribArray(0))
-//    GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr))
-//    std::cout << "vertex vbo: " << vertexBufferId << std::endl;
-
-//    GLCall(glGenBuffers(1, &colorBufferId))
-//    GLCall(glBindBuffer(GL_ARRAY_BUFFER, colorBufferId))
-//    GLCall(glBufferData(GL_ARRAY_BUFFER, colors.size() * 3 * sizeof(float), &colors[0], GL_STATIC_DRAW))
-//    VertexBuffer cb = VertexBuffer(&colors[0], colors.size() * 3 * sizeof(float));
-//    layout.push<float>(3);
-//    va.addBuffer(cb, layout);
-//    GLCall(glEnableVertexAttribArray(1))
-//    GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr))
-//    std::cout << "color vbo: " << colorBufferId << std::endl;
-
     IndexBuffer ib = IndexBuffer(&indices[0], indices.size());
-//    GLCall(glGenBuffers(1, &indexBufferId))
-//    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId))
-//    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW))
-    std::cout << "index vbo: " << indexBufferId << std::endl;
 
     GLCall(glBindVertexArray(0))
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0))
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0))
+    vb.unBind();
+    ib.unBind();
 
     glm::mat4 proj = glm::ortho(-9.0f, 9.0f, -7.0f, 7.0f, 1.0f, -1.0f);
 
@@ -140,10 +115,7 @@ int main() {
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
         GLCall(glClearColor(0.1, 0.1, 0.1, 1.0)) // set color to red
 
-        GLCall(glUseProgram(programId))
-
-//        GLCall(glBindVertexArray(vaoId))
-//        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId))
+        shader.bind();
         va.bind();
         ib.bind();
 

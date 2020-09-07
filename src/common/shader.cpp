@@ -21,32 +21,34 @@ unsigned int Shader::loadShader(const char *vertex_file_path, const char *fragme
     unsigned int fragmentShaderId = compileShader(GL_FRAGMENT_SHADER, fsCode);
 
     // Link the program
-    std::cout << "Linking program\n" << std::endl;
-    ProgramID = glCreateProgram();
 
-    GLCall(glAttachShader(ProgramID, vertexShaderId))
-    GLCall(glAttachShader(ProgramID, fragmentShaderId))
-    GLCall(glLinkProgram(ProgramID))
-    GLCall(glValidateProgram(ProgramID))
+    unsigned int programId = glCreateProgram();
+
+    GLCall(glAttachShader(programId, vertexShaderId))
+    GLCall(glAttachShader(programId, fragmentShaderId))
+    GLCall(glLinkProgram(programId))
+    GLCall(glValidateProgram(programId))
 
     // Check the program
-    GLCall(glGetProgramiv(ProgramID, GL_LINK_STATUS, &result))
-    GLCall(glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogLength))
+    GLCall(glGetProgramiv(programId, GL_LINK_STATUS, &result))
+    GLCall(glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &infoLogLength))
     if (infoLogLength > 0) {
         std::vector<char> ProgramErrorMessage(infoLogLength + 1);
-        GLCall(glGetProgramInfoLog(ProgramID, infoLogLength, nullptr, &ProgramErrorMessage[0]));
+        GLCall(glGetProgramInfoLog(programId, infoLogLength, nullptr, &ProgramErrorMessage[0]));
         printf("%s\n", &ProgramErrorMessage[0]);
     }
 
+    std::cout << "Shader successfully linked with id: " << programId << std::endl;
+
 //    This deletes the shader source code, which is not good in case we use
 //      Debugging tools
-//    glDetachShader(ProgramID, vertexShaderId);
-//    glDetachShader(ProgramID, fragmentShaderId);
+//    glDetachShader(programId, vertexShaderId);
+//    glDetachShader(programId, fragmentShaderId);
 
     GLCall(glDeleteShader(vertexShaderId))
     GLCall(glDeleteShader(fragmentShaderId))
 
-    return ProgramID;
+    return programId;
 }
 
 unsigned int Shader::compileShader(unsigned int type, const std::string &source) {
@@ -87,4 +89,20 @@ std::string Shader::readSource(const char *file_path) {
     }
 
     return shaderCode;
+}
+
+Shader::Shader(const char* vertex_filepath, const char* frag_filepath) {
+    ProgramID = loadShader(vertex_filepath, frag_filepath);
+}
+
+Shader::~Shader() {
+    GLCall(glDeleteShader(ProgramID))
+}
+
+void Shader::bind() {
+    GLCall(glUseProgram(ProgramID))
+}
+
+void Shader::unBind() {
+    GLCall(glUseProgram(0))
 }

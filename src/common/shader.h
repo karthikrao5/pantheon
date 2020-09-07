@@ -12,6 +12,11 @@
 class Shader {
 public:
     unsigned int ProgramID{};
+    Shader(const char *vertex_filepath, const char *frag_filepath);
+    ~Shader();
+
+    void bind();
+    void unBind();
 
     unsigned int loadShader(const char *vertex_file_path, const char *fragment_file_path);
 //    void setUniformMat4f(std::string uniformName, glm::mat4 matrix);
