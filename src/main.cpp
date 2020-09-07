@@ -9,6 +9,7 @@
 #include "common/VertexBuffer.h"
 #include "common/IndexBuffer.h"
 #include "common/VertexArray.h"
+#include "common/Renderer.h"
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -103,23 +104,15 @@ int main() {
     vb.unBind();
     ib.unBind();
 
-    glm::mat4 proj = glm::ortho(-9.0f, 9.0f, -7.0f, 7.0f, 1.0f, -1.0f);
+    shader.bind();
+    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
+    shader.setUniformMat4f("u_mvp", proj);
 
-    // Enable depth test
-    GLCall(glEnable(GL_DEPTH_TEST))
-    GLCall(glEnable(GL_CULL_FACE))
-    // Accept fragment if it closer to the camera than the former one
-    GLCall(glDepthFunc(GL_LESS))
-
+    Renderer renderer;
     while (!glfwWindowShouldClose(window)) {
-        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
-        GLCall(glClearColor(0.1, 0.1, 0.1, 1.0)) // set color to red
+        renderer.clear();
 
-        shader.bind();
-        va.bind();
-        ib.bind();
-
-        GLCall(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, nullptr))
+        renderer.draw(va, ib, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

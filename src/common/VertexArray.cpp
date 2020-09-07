@@ -31,7 +31,7 @@ void VertexArray::addBuffer(const VertexBuffer &vb, const VertexBufferLayout &la
     }
 }
 
-void VertexArray::bind() {
+void VertexArray::bind() const {
     GLCall(glBindVertexArray(m_RendererID))
 }
 

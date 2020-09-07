@@ -99,10 +99,28 @@ Shader::~Shader() {
     GLCall(glDeleteShader(ProgramID))
 }
 
-void Shader::bind() {
+void Shader::bind() const {
     GLCall(glUseProgram(ProgramID))
 }
 
 void Shader::unBind() {
     GLCall(glUseProgram(0))
+}
+
+void Shader::setUniformMat4f(const std::string& uniformName, const glm::mat4& matrix) {
+    GLCall(glUniformMatrix4fv(getShaderLocation(uniformName), 1, GL_FALSE, &matrix[0][0]))
+}
+
+int Shader::getShaderLocation(const std::string& name) {
+    if (m_LocationCache.find(name) != m_LocationCache.end()) {
+        return m_LocationCache[name];
+    }
+
+    int location = glGetUniformLocation(ProgramID, name.c_str());
+    if (location == -1) {
+        std::cout << "Warning, uniform " << name << " does not exist!" << std::endl;
+    }
+    m_LocationCache[name] = location;
+
+    return location;
 }

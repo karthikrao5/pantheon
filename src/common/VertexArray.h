@@ -18,8 +18,8 @@ public:
 
     void addBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 
-    void bind();
-    void unBind();
+    void bind() const;
+    static void unBind();
 };
 
 #endif //PANTHEON_VERTEXARRAY_H
