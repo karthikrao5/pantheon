@@ -105,14 +105,34 @@ int main() {
     ib.unBind();
 
     shader.bind();
-    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
-    shader.setUniformMat4f("u_mvp", proj);
+//    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
+//    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f,0 ));
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
+    glm::mat4 view = glm::lookAt(
+            glm::vec3(4,3,3), // Camera is at (4,3,3), in World Space
+            glm::vec3(0,0,0), // and looks at the origin
+            glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+    );
 
     Renderer renderer;
+    float rotation = 0;
     while (!glfwWindowShouldClose(window)) {
         renderer.clear();
 
+        shader.bind();
+
+        glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(1.0f, 1.0f, 1.0f));
+
+        shader.setUniformMat4f("u_mvp", proj * view * model);
+
         renderer.draw(va, ib, shader);
+
+        if (rotation > 180.0f) {
+            rotation = 0;
+        } else {
+            rotation += 0.5f;
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
