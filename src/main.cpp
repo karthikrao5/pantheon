@@ -13,6 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "common/controls.h"
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -119,13 +120,10 @@ int main() {
 //    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
 //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f,0 ));
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view = glm::lookAt(
-            glm::vec3(5,5,4), // Camera is at (4,3,3), in World Space
-            glm::vec3(0,0,0), // and looks at the origin
-            glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-    );
+    glm::mat4 view(1.0f);
 
     Renderer renderer;
+    Controls controls(window);
     glm::vec3 model_position(0, 0, 0);
     glm::vec3 rotation_vec(1.0f, 1.0f, 1.0f);
 
@@ -153,6 +151,7 @@ int main() {
 
         shader.bind();
 
+//        view = controls.getViewMatrix();
         glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationRadians * 2.0f), glm::vec3(xRot ? 1.0f : 0, yRot ? 1.0f : 0, zRot ? 1.0f : 0));
         glm::mat4 model = rotation * glm::translate(glm::mat4(1.0f), model_position);
 
