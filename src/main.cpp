@@ -121,7 +121,7 @@ int main() {
     shader.bind();
 //    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
 //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f,0 ));
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
+//    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
 //    glm::mat4 view(1.0f);
 //    glm::mat4 view = glm::lookAt(
 //            glm::vec3(5,5,4), // Camera is at (4,3,3), in World Space
@@ -168,6 +168,7 @@ int main() {
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = controls.getViewMatrix();
+        glm::mat4 proj = controls.getProjectionMatrix();
 //        view = glm::lookAt(
 //                glm::vec3(camX, 0.0, camZ),
 //                glm::vec3(0.0, 0.0, 0.0),

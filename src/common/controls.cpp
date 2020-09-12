@@ -10,6 +10,7 @@ Controls::Controls(GLFWwindow *windowInput) {
     glfwSetWindowUserPointer(windowInput, this);
 
     glfwSetCursorPosCallback(windowInput, MouseCallback);
+    glfwSetScrollCallback(windowInput, ScrollCallback);
 
     cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -19,6 +20,8 @@ Controls::Controls(GLFWwindow *windowInput) {
             cameraPos,
             cameraPos + cameraFront,
             cameraUp);
+
+    proj = glm::perspective(glm::radians(zoom), 1280.0f/720.0f, 0.1f, 100.0f);
 //    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
 }
@@ -40,6 +43,20 @@ void Controls::handleInput() {
 
 glm::mat4 Controls::getViewMatrix() const {
     return view;
+}
+
+glm::mat4 Controls::getProjectionMatrix() const {
+    return proj;
+}
+
+auto Controls::scroll_callback(GLFWwindow *window, double xoffset, double yoffset) -> void {
+    zoom -= (float) yoffset;
+    if (zoom < 1.0f)
+        zoom = 1.0f;
+    if (zoom > 45.0f)
+        zoom = 45.0f;
+    proj = glm::perspective(glm::radians(zoom), 1280.0f / 720.0f, 0.1f, 100.0f);
+
 }
 
 auto Controls::mouse_callback(GLFWwindow *window, double xpos, double ypos) -> void {
