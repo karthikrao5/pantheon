@@ -41,6 +41,7 @@ int main() {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
@@ -55,7 +56,8 @@ int main() {
     glfwSwapInterval(1);
 
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void) io;
     io.Fonts->AddFontDefault();
     io.Fonts->Build();
 
@@ -119,8 +121,13 @@ int main() {
     shader.bind();
 //    glm::mat4 proj = glm::ortho(-4.5f, 4.5f, -3.5f, 3.5f, 1.0f, -1.0f);
 //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f,0 ));
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view(1.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
+//    glm::mat4 view(1.0f);
+//    glm::mat4 view = glm::lookAt(
+//            glm::vec3(5,5,4), // Camera is at (4,3,3), in World Space
+//            glm::vec3(0,0,0), // and looks at the origin
+//            glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+//    );
 
     Renderer renderer;
     Controls controls(window);
@@ -138,21 +145,38 @@ int main() {
         renderer.clear();
 
         {
-            ImGui::Checkbox("xRot", &xRot); ImGui::SameLine();
-            ImGui::Checkbox("yRot", &yRot); ImGui::SameLine();
-            ImGui::Checkbox("zRot", &zRot); ImGui::SameLine();
+            ImGui::Checkbox("xRot", &xRot);
+            ImGui::SameLine();
+            ImGui::Checkbox("yRot", &yRot);
+            ImGui::SameLine();
+            ImGui::Checkbox("zRot", &zRot);
+            ImGui::SameLine();
             ImGui::Checkbox("Wireframe", &wireframeMode);
             ImGui::SliderFloat3("Translation", &model_position.x, 0.0f, 1.0f);
             ImGui::SliderFloat("Rotation", &rotationRadians, 0.0f, 1000.0f);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                        ImGui::GetIO().Framerate);
         }
 
         renderer.setWireframeMode(wireframeMode);
 
-        shader.bind();
+//        shader.bind();
+
+        controls.handleInput();
+
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::mat4 view = controls.getViewMatrix();
+//        view = glm::lookAt(
+//                glm::vec3(camX, 0.0, camZ),
+//                glm::vec3(0.0, 0.0, 0.0),
+//                glm::vec3(0.0, 1.0, 0.0)
+//        );
 
 //        view = controls.getViewMatrix();
-        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationRadians * 2.0f), glm::vec3(xRot ? 1.0f : 0, yRot ? 1.0f : 0, zRot ? 1.0f : 0));
+        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationRadians * 2.0f),
+                                         glm::vec3(xRot ? 1.0f : 0, yRot ? 1.0f : 0, zRot ? 1.0f : 0));
         glm::mat4 model = rotation * glm::translate(glm::mat4(1.0f), model_position);
 
         shader.setUniformMat4f("u_mvp", proj * view * model);

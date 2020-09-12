@@ -6,12 +6,25 @@
 
 Controls::Controls(GLFWwindow *windowInput) {
     window = windowInput;
+
+    glfwSetWindowUserPointer(windowInput, this);
+
+    glfwSetCursorPosCallback(windowInput, MouseCallback);
+
     cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    direction = glm::vec3(0.0f, 0.0f, 0.0f);
+    view = glm::lookAt(
+            cameraPos,
+            cameraPos + cameraFront,
+            cameraUp);
+//    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
 }
 
-void Controls::handleInput() const {
+
+void Controls::handleInput() {
     const float cameraSpeed = 0.05f; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
@@ -27,4 +40,35 @@ void Controls::handleInput() const {
 
 glm::mat4 Controls::getViewMatrix() const {
     return view;
+}
+
+auto Controls::mouse_callback(GLFWwindow *window, double xpos, double ypos) -> void {
+    if (firstMouse) // initially set to true
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+//    check contraints
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
 }

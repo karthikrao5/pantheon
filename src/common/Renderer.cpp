@@ -25,9 +25,7 @@ Renderer::Renderer() {
     GLCall(glDepthFunc(GL_LESS))
 }
 
-Renderer::~Renderer() {
-
-}
+Renderer::~Renderer() = default;
 
 void Renderer::setWireframeMode(bool wireframeMode) const {
     glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
