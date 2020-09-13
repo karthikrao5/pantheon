@@ -15,6 +15,9 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "common/controls.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "vendor/stb_image.h"
+
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -66,17 +69,39 @@ int main() {
 
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+// set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("src/resources/container.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
     std::vector<float> vertices = {
             // front
-            -0.5, -0.5, 0.5, 1.0, 0.0, 0.0,
-            0.5, -0.5, 0.5, 0.0, 1.0, 0.0,
-            0.5, 0.5, 0.5, 0.0, 0.0, 1.0,
-            -0.5, 0.5, 0.5, 1.0, 1.0, 1.0,
+            -0.5, -0.5, 0.5,    1.0, 0.0, 0.0,  0.0f, 0.0f,   // bottom left
+            0.5, -0.5, 0.5,     0.0, 1.0, 0.0,  1.0f, 0.0f,   // bottom right
+            0.5, 0.5, 0.5,      0.0, 0.0, 1.0,  1.0f, 1.0f,   // top right
+            -0.5, 0.5, 0.5,     1.0, 1.0, 1.0,  0.0f, 1.0f    // top left `
             // back
-            -0.5, -0.5, -0.5, 1.0, 0.0, 0.0,
-            0.5, -0.5, -0.5, 0.0, 1.0, 0.0,
-            0.5, 0.5, -0.5, 0.0, 0.0, 1.0,
-            -0.5, 0.5, -0.5, 1.0, 1.0, 1.0
+            -0.5, -0.5, -0.5,   1.0, 0.0, 0.0,  0.0f, 0.0f,   // bottom left
+            0.5, -0.5, -0.5,    0.0, 1.0, 0.0,  1.0f, 0.0f,   // bottom right
+            0.5, 0.5, -0.5,     0.0, 0.0, 1.0,  1.0f, 1.0f,   // top right
+            -0.5, 0.5, -0.5,    1.0, 1.0, 1.0,  0.0f, 1.0f    // top left
     };
 
     std::vector<unsigned short> indices = {
@@ -100,8 +125,8 @@ int main() {
             6, 7, 3
     };
 
-    const std::string vertexFile = "src/common/vertex_shader.glsl";
-    const std::string fragFile = "src/common/frag.glsl";
+    const std::string vertexFile = "src/resources/shaders/vertex_shader.glsl";
+    const std::string fragFile = "src/resources/shaders/frag.glsl";
     Shader shader(vertexFile.c_str(), fragFile.c_str());
 
     VertexArray va;
@@ -110,6 +135,7 @@ int main() {
     VertexBufferLayout layout;
     layout.push<float>(3); // vec3 for x,y,z vertex positions
     layout.push<float>(3); // vec3 for r,g,b color values per vertex
+    layout.push<float>(2); // vec2 for uv textcoords
     va.addBuffer(vb, layout);
 
     IndexBuffer ib = IndexBuffer(&indices[0], indices.size());
