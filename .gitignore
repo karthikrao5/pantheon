@@ -8,3 +8,10 @@ opengl_tutorial
 opengl_tutorial.cbp
 imgui.ini
 .idea/
+
+CMakeCache.txt
+*.a
+pantheon
+pantheon.cbp
+Makefile
+Testing
